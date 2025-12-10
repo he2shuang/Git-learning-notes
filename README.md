@@ -1,4 +1,4 @@
-# MCP-learning-notes
+# Git-learning-notes
 这个仓库就是用来熟悉git的相关操作的，练习使用常用的工具TortoiseGit，VSCode插件等。
 
 25-12-10创建流程：
