@@ -1,0 +1,384 @@
+参考文档：https://www.bookstack.cn/read/backlog-git-tutorial/35.md
+https://cloud.tencent.com/developer/article/1648574?policyId=1003
+https://cloud.tencent.com/developer/article/1497959?policyId=1004
+https://cloud.tencent.com/developer/article/2423833?policyId=1003
+https://cloud.tencent.com/developer/article/1075830
+https://blog.csdn.net/weixin_43717839/article/details/143222436
+
+客户端TortoiseGit：https://blog.csdn.net/scott198510/article/details/138337623
+
+0、设置用户名和电子邮件：使用config命令
+$ git config --global user.name "<用户名>"
+$ git config --global user.email "<电子邮件>"
+
+可以为Git命令设定别名。例如：把「checkout」缩略为「co」，然后就使用「co」来执行命令。
+$ git config --global alias.co checkout
+
+如果在Windows使用命令行 (Git Bash), 含非ASCII字符的文件名会显示为 "\346\226\260\350\246…"。若设定如下，就可以让含非ASCII字符的文件名正确显示了。
+$ git config --global core.quotepath off
+
+通过代理主机连接http
+在.gitconfig文件的http项目添加以下的设定。
+[http]
+proxy = <代理主机的电子邮件地址>:<代理主机的端口号码>
+config命令可以使用以下设定。
+$ git config --global http.proxy <代理主机的电子邮件地址>:<代理主机的端口号码>
+
+通过需要用户认证的代理主机连接http
+在.gitconfig文件的http项目添加以下的设定。
+[http]
+proxy = http://<用户名>:<密码>@<代理主机的电子邮件地址>:<代理主机的端口号码>
+config命令可以用以下的设定。
+$ git config --global http.proxy http://<用户名>:<密码>@<代理主机的电子邮件地址>:<代理主机的端口号码>
+
+显示设定清单
+$ git config --global --list
+
+# 删除全局配置
+$ git config --global --unset alias.xxx
+$ git config --global --unset user.xxx
+
+1、新建数据库：
+首先在任意一个地方创建tutorial目录。然后使用init命令把该tutorial目录移动到本地Git数据库。
+$ git init
+
+2、提交文件：
+使用status命令确认工作树和索引的状态。
+$ git status
+添加-s选项，就可以不显示讲解。如果再添加-b选项，就不显示讲解，但显示分支的名称。
+
+将不在索引的文件加入到索引，要使用add命令。在<file>指定加入索引的文件。用空格分割可以指定多个文件。
+$ git add <file>..
+从暂存区移除到工作区
+git -rm --cache <file>..
+指定参数「.」，可以把所有的文件加入到索引。
+$ git add .
+也可以使用通配符：git add *.txt  表示将所有以“.txt”结尾的文件暂存
+
+文件已加入到索引，我们就可以提交文件了。请执行如下显示的commit命令。
+$ git commit -m ""
+
+使用log命令，我们可以在数据库的提交记录看到新的提交。
+$ git log --graph --oneline
+
+3、push到远程数据库：在远程数据库创建分支／反映修改内容到分支
+使用remote指令添加远程数据库。在<name>处输入远程数据库名称，在<url>处指定远程数据库的URL。
+$ git remote add <name> <url>
+执行推送或者拉取的时候，如果省略了远程数据库的名称，则默认使用名为”origin“的远程数据库。因此一般都会把远程数据库命名为origin。
+$ git remote add origin https://[your_space_id].backlogtool.com/git/[your_project_key]/tutorial.git
+
+使用push命令向数据库推送更改内容。<repository>处输入目标地址，<refspec>处指定推送的分支。我们将在高级篇详细地对分支进行说明。
+$ git push <repository> <refspec>...
+当执行命令时，如果您指定了-u选项，那么下一次推送时就可以省略分支名称了。但是，首次运行指令向空的远程数据库推送时，必须指定远程数据库名称和分支名称。
+$ git push -u origin master
+
+4、克隆远程数据库：
+使用clone指令可以复制数据库，在<repository>指定远程数据库的URL， 在<directory>指定新目录的名称。
+$ git clone <repository> <directory>
+执行以下指令后，会在目录(tutorial2) 复制远程数据库。
+$ git clone https://nulab.backlog.jp/git/BLG/tutorial.git tutorial2
+
+5、从克隆的数据库进行push
+$ git add sample.txt
+$ git commit -m "添加add的说明"
+当在克隆的数据库目录执行推送时，您可以省略数据库和分支名称。
+$ git push
+
+6、从远程数据库pull：读取远程数据库的分支的修改内容
+把在上一页面中从“tutorial2”推送到远程数据库的内容拉取到数据库目录“tutorial”
+使用pull指令进行拉取操作。省略数据库名称的话，会在名为origin的数据库进行pull。
+$ git pull <repository> <refspec>...
+$ git pull origin master
+
+解决冲突：==分割线上方是本地数据库的内容, 下方是远程数据库的编辑内容。
+$ git pull origin master
+$ git add sample.txt
+$ git commit -m "合并"
+$ git push
+
+查看远程数据库分支的修改内容
+$ git fetch <repository> <refspec>
+想确认远程数据库的修改内容，但不想反映内容到本地数据库时，可以使用fetch命令。使用fetch命令不会修改本地数据库的分支
+
+删除远程数据库的分支
+$ git push --delete <repository> <branchname>
+
+建立远程数据库的标签
+$ git push <repository> <tagname>
+添加--tags选项，就可以把本地数据库里所有的标签添加到远程数据库。
+
+删除远程数据库的标签
+$ git push --delete <repository> <tagname>
+在push命令指定--delete选项和<远程数据库名称> <要削除的标签> ，然后执行。
+
+修改已注册的远程数据库的电子邮件地址
+$ git remote set-url <name> <newurl>
+把已指定名称注册的远程数据库的电子邮件地址改为<newurl> 地址。
+
+修改已注册的远程数据库
+$ git remote rename <old> <new>
+在<old>把已指定名称注册的远程数据库的名称改为<new> 。
+
+我们可以用log命令来确认数据库的历史记录是否准确。指定--graph选项，能以文本形式显示更新记录的流程图。指定--oneline选项，能在一行中显示提交的信息。
+$ git log --graph --oneline
+
+文件误删除：
+git restore <file>...
+如果把删除操作提交了，也就不是误删除，需要版本回退
+git reset --hard 版本号
+但是reset操作会丢失这两个版本之间的记录
+git revert 做修改操作的版本号（需要还原的版本的下一个版本）
+Git 远程仓库版本回退方法
+https://blog.csdn.net/crazykiller/article/details/76147305?sharetype=blogdetail&amp;sharerId=76147305&amp;sharerefer=WAP&amp;sharesource=
+
+高级篇：
+分支：
+若要切换作业的分支，就要进行checkout操作。进行checkout时，git会从工作树还原向目标分支提交的修改内容。checkout之后的提交记录将被追加到目标分支。
+HEAD指向的是现在使用中的分支的最后一次更新。通常默认指向master分支的最后一次更新。通过移动HEAD，就可以变更使用的分支。
+还未提交的修改内容以及新添加的文件，留在索引区域或工作树的情况下切换到其他的分支时，修改内容会从原来的分支移动到目标分支。
+但是如果在checkout的目标分支中相同的文件也有修改，checkout会失败的。这时要么先提交修改内容，要么用stash暂时保存修改内容后再checkout。
+stash是临时保存文件修改内容的区域。stash可以暂时保存工作树和索引里还没提交的修改内容，您可以事后再取出暂存的修改，应用到原先的分支或其他的分支上。
+1、建立分支：
+$ git branch <branchname>
+$ git branch issue1
+不指定参数直接执行branch命令的话，可以显示分支列表。 前面有*的就是现在的分支。
+$ git branch
+  issue1
+* master
+添加-a选项，就可以显示包括远端分支在内的分支清单。
+修改分支的名称
+$ git branch -m <oldbranch> <newbranch>
+在检出的标签的基础上，创建一个新分支
+git branch <new_branch_name> <tag_name>
+new_branch_name新分支名，tag_name标签名
+用git push命令将新建的分支推到远端
+git push origin <new_branch_name>
+
+2、切换分支：
+若要在新建的issue1分支进行提交，需要切换到issue1分支。要执行checkout命令以退出分支。
+$ git checkout <branch>
+$ git checkout issue1
+在checkout命令指定 -b选项执行，可以创建分支并进行切换。
+$ git checkout -b <branch> origin/<branch>
+用chekout命令参数指定远程数据库的分支，就可以通过远程数据库的分支在本地数据库创建分支。
+拉取远程分支到本地并切换到该分支
+git checkout -t origin/<branch>
+
+3、合并分支：
+向master分支合并issue1分支的修改。执行merge命令以合并分支。该命令将指定分支导入到HEAD指定的分支。
+$ git merge <commit>
+先切换master分支，然后把issue1分支导入到master分支。
+$ git checkout master
+$ git merge issue1
+
+merge的特殊选项：squash
+用这个选项指定分支的合并，就可以把所有汇合的提交添加到分支上。
+$ git checkout master
+$ git merge --squash issue1
+主要使用的场合：
+汇合主题分支的提交，然后合并提交到目标分支。
+
+
+4、删除分支：
+在branch命令指定-d选项执行，以删除分支。
+$ git branch -d <branchname>
+$ git branch -d issue1
+$ git branch
+
+# 删除远程分支
+# 推送一个空分支到远程分支，其实就相当于删除远程分支
+$ git push origin  :远程分支名
+# 或者
+$ git push origin --delete 远程分支名
+
+5、并行操作：
+首先创建issue2分支和issue3分支，并切换到issue2分支。
+$ git branch issue2
+$ git branch issue3
+$ git checkout issue2
+$ git branch
+$ git add myfile.txt
+$ git commit -m "添加commit的说明"
+$ git checkout issue3
+$ git add myfile.txt
+$ git commit -m "添加pull的说明"
+
+6、解决合并冲突
+把issue2分支和issue3分支的修改合并到master。
+$ git checkout master
+$ git merge issue2
+$ git merge issue3
+$ git add myfile.txt
+$ git commit -m "合并issue3分支"
+
+7、用rebase合并：
+合并issue3分支的时候，使用rebase可以使提交的历史记录显得更简洁。
+
+现在暂时取消刚才的合并。
+$ git reset --hard HEAD~
+
+切换到issue3分支后，对master执行rebase。
+$ git checkout issue3
+$ git rebase master
+rebase的时候，修改冲突后的提交不是使用commit命令，而是执行rebase命令指定 --continue选项。若要取消rebase，指定 --abort选项。
+$ git add myfile.txt
+$ git rebase --continue
+
+# 不管是否存在对应的远程分支，将本地的所有分支都推送到远程主机
+$ git push --all origin
+
+修改最近一次的提交
+主要使用的场合：
+添加最近提交时漏掉的档案
+修改最近提交的注解
+
+修改后
+$ git add sample.txt
+$ git commit --amend
+编辑工具会显示最近一次提交的提交消息，把消息修改为「自己想写的新消息」并进行保存。
+
+
+在cherry-pick，您可以从其他分支复制指定的提交，然后导入到现在的分支。
+主要使用的场合：
+把弄错分支的提交移动到正确的地方
+把其他分支的提交添加到现在的分支
+
+把修改移动到master分支后，用cherry-pick 取出「添加commit的讲解」提交，然后将其添加到master。
+$ git checkout master
+$ git cherry-pick 99daed2
+
+改写提交的历史记录：在rebase指定i选项，您可以改写、替换、删除或合并提交。
+主要使用的场合：
+在push之前，重新输入正确的提交注解
+清楚地汇合内容含义相同的提交。
+添加最近提交时漏掉的档案
+
+若要汇合过去的2个提交，请用rebase -i。
+$ git rebase -i HEAD~~
+打开文本编辑器，将看到从HEAD到HEAD~~的提交如下图显示。
+pick 9a54fd4 添加commit的说明
+pick 0d4a808 添加pull的说明
+将第二行的“pick”改成“squash”，然后保存并退出。由于合并后要提交，所以接着会显示提交信息的编辑器，请编辑信息后保存并退出。
+
+用rebase -i ，首先选择要修改的提交。
+$ git rebase -i HEAD~~
+打开文本编辑器，将看到从HEAD到HEAD~~的提交如下图显示。
+pick 9a54fd4 添加commit的说明
+pick 0d4a808 添加pull的说明
+将第一行的“pick”改成“edit”，然后保存并退出。将会显示以下内容，修改过的提交呈现退出状态。
+$ git add sample.txt
+$ git commit --amend
+现在已经commit，但是rebase操作还没结束。若要通知这个提交的操作已经结束，请指定 —continue选项执行rebase。
+$ git rebase --continue
+
+
+标签：
+创建标签：
+git tag 标签名 版本号
+
+建立含批注的标签
+$ git tag -a <tagname> 版本号
+
+也可以指定-m选项来添加注解。
+在HEAD指向的提交里添加名为banana的标签，请执行以下的命令。
+$ git tag -am "连猴子都懂的Git" banana
+# 创建带有说明的标签，用 -a 指定标签名，-m 指定说明文字
+$ git tag -a v0.1 -m "version 0.1 released"
+
+查看标签
+git tag
+添加-n选项，就可以显示标签的注解。
+
+删除标签
+git tag -d 标签名
+
+# 推送一个本地标签
+$ git push origin <tagname>
+# 推送全部未推送过的本地标签
+$ git push origin --tags
+
+
+ssh安全认证：
+生成安全认证文件
+ssh-keygen -t rsa -C+shh地址
+
+把不需要用的文件归类到非管理对象
+$ echo <filename> >> .gitignore
+
+
+正在dev分支开发新功能，做到一半时有人过来反馈一个bug，让马上解决，但是新功能做到了一半你又不想提交，
+这时就可以使用git stash命令先把当前进度（工作区和暂存区）保存起来，然后切换到另一个分支去修改bug，
+修改完提交后，再切回dev分支，使用gitstash pop来恢复之前的进度继续开发新功能。
+
+暂时保存现状的操作
+$ git stash save
+可以省略save，也可以指定save之后显示内容的信息。
+
+显示暂存列表
+$ git stash list
+
+恢复暂存的操作
+$ git stash pop
+如果不指定参数，在对比操作中可以复原到最新的操作。指定类似stash@{1}的参数，可以复原特定的操作。
+
+删除暂存的操作
+$ git stash drop
+如果不指定参数，在对比操作中会删除最新的操作。指定类似stash@{1}的参数，可以删除特定的操作。
+
+删除所有暂存的操作
+$ git stash clear
+
+
+‌Git Flow‌是一种基于Git的分支管理模型，旨在帮助团队更好地管理和发布软件。它由Vincent Driessen在2010年提出，通过一套标准的分支命名和工作流程，使开发、测试和发布过程更加有序和高效‌
+
+Git Flow的核心概念
+Git Flow主要包括以下几类分支：
+
+‌master分支‌：用于生产环境的稳定代码，每次发布新版本时，从develop分支合并到master分支‌
+‌develop分支‌：用于集成所有开发分支，代表最新的开发进度。功能分支合并到此分支后，再合并到master分支‌
+‌feature分支‌：用于开发新功能，完成后合并到develop分支‌
+‌release分支‌：用于准备新版本的发布，测试通过后合并到master和develop分支‌
+‌hotfix分支‌：用于修复生产环境中的紧急问题，修复后合并到master和develop分支
+
+Git Flow的工作流程
+‌新功能开发‌：从develop分支切出一个新的feature分支，进行新功能开发。完成后提交Pull Request进行代码审查，审查通过后合并到develop分支‌
+
+‌版本发布准备‌：当develop分支上的功能足够进行新版本发布时，从develop分支切出一个release分支。在release分支上进行最后的测试，修复发现的问题。测试通过后，将release分支合并到master和develop分支‌
+
+‌紧急问题修复‌：在生产环境中发现紧急问题时，从master分支切出一个新的hotfix分支进行修复。修复后合并到master和develop分支‌
+
+Git Flow的安装和使用方法
+Git Flow可以通过各种包管理器安装，例如在Linux上可以使用apt-get或dnf安装，在macOS上可以使用Homebrew安装，在Windows上可以通过Git for Windows、Scoop或Chocolatey安装。如果以上方法不可用，也可以从源代码安装‌
+安装完成后，可以通过命令行验证是否成功安装：
+git flow version
+
+如何完整迁移 Git 仓库？
+(1) 准备工作
+在开始移动之前，请确保拥有存储库的备份，并且所有本地更改都已提交并推送到当前远程。此步骤将防止在转换过程中丢失任何数据。
+(2) 克隆仓库
+首先，使用 git clone 命令将存储库克隆到本地机器上。该命令将创建一个带有存储库名称的新目录，其中包含整个 Git 存储库的副本，包括所有分支、标签和提交历史。
+git clone https://old-remote-url.com/your-repo.git
+(3) 添加新远程仓库
+切换到新创建的存储库目录，接下来，使用 git remote add 命令添加新的远程存储库关联。
+cd your-repo
+git remote add new-origin https://new-remote-url.com/your-repo.git
+(4) 推送新远程仓库
+使用带有 --al 和 --tags 选项的 git push 命令将所有分支、标签推送到新的远程存储库。
+git push new-origin --all
+git push new-origin --tags
+(5) 更新本地引用
+更新本地存储库，以使用新的远程作为其默认源。使用 git remote remove 命令删除旧的远程，并使用 git remote rename 命令将新远程重命名为 origin。
+git remote remove origin 
+git remote rename new-origin origin
+(6) 处理子模块
+如果存储库包含子模块，还需要更新它们的远程地址。对于每个子模块，切换到其目录并按照步骤 3-5 添加新的远程、推送更改和更新本地引用。
+(7) 通知协作者
+通知所有协作者存储库的重新定位，并向他们提供新的远程 URL。他们需要通过重新克隆存储库或使用 git remote set-url 命令更改远程 URL 来更新本地存储库。
+git remote set-url origin https://new-remote-url.com/your-repo.git
+
+
+Git 版本回退：
+https://blog.csdn.net/crazykiller/article/details/76147305?sharetype=blogdetail&amp;sharerId=76147305&amp;sharerefer=WAP&amp;sharesource=
+
+git push --force-with-lease：
+https://blog.csdn.net/WPwalter/article/details/80371264

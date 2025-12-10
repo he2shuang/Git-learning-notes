@@ -1,0 +1,77 @@
+$ ssh-keygen -t ed25519 -C "Gitee SSH Key"
+$ git clone git@gitee.com:muo-yan/git-test_2024_-li-meng.git
+
+1：将本地代码上传到【存储仓库1】，版本号：v1.0
+git status
+git add .
+git commit -m "the first change"
+git help
+git tag v1.0
+git pull
+git push
+git tag
+git push origin v1.0
+git checkout -b dev
+git branch
+git checkout master
+
+======================================
+添加信息v1.1
+======================================
+
+git status
+git add .
+git commit -m "the second change"
+git tag v1.1
+git pull
+git push
+git tag
+git push origin v1.1
+
+===========================================================
+此时刷新远程数据库发现只有一个master分支，已有v1.0和v1.1标签
+===========================================================
+
+git push --set-upstream origin dev
+
+===========================================================
+添加信息 dev new feature
+===========================================================
+
+git add .
+git commit -m "dev new feature"
+git pull
+git push
+
+===========================================================
+此时查看远程数据库已有dev分支，且dev分支有v1.0的内容和自己的内容并没有v1.1后添加的内容
+===========================================================
+
+git log --graph --oneline
+git rebase v1.1
+git log --graph --oneline
+git push --force-with-lease
+
+===========================================================
+此时查看远程数据库dev分支有v1.1的内容和自己的内容
+===========================================================
+
+git checkout master
+git merge dev
+git push
+
+git remote add repository http://fuyun.fun:6610/git_test_2024_limeng
+git push repository master
+git push repository dev
+git push repository --tags
+
+============================================================
+再从远程仓库2克隆到本地，查看内容和历史履历
+============================================================
+$ git clone http://fuyun.fun:6610/git_test_2024_limeng
+$ cd git_test_2024_limeng/
+$ git log --graph --oneline
+* ddec5b3 (HEAD -> master, origin/master, origin/dev, origin/HEAD) dev new feature
+* 0dce053 (tag: v1.1) the second change
+* 82f808c (tag: v1.0) the first change
+* 8522387 Initial commit
